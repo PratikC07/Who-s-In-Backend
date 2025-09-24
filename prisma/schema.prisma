@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  photoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  polls Poll[] // A user can have many polls
+  votes Vote[] // A user can have many votes
+}
+
+model Poll {
+  id        String   @id @default(uuid())
+  title     String
+  status    String   @default("active")
+  shareCode String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  UserId String //ForeignKey 
+  user   User   @relation(fields: [UserId], references: [id])
+
+  options Option[] // A poll has many options
+  votes   Vote[] // A poll has many votes
+
+  @@index([UserId])
+}
+
+model Option {
+  id        String   @id @default(uuid())
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  pollId String //ForeignKey
+  poll   Poll   @relation(fields: [pollId], references: [id])
+
+  votes Vote[] // An option has many votes
+
+  @@index([pollId])
+}
+
+model Vote {
+  id        String   @id @default(uuid())
+  voterName String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  PollId String //ForeignKey
+  poll   Poll   @relation(fields: [PollId], references: [id])
+
+  OptionId String //ForeignKey
+  option   Option @relation(fields: [OptionId], references: [id])
+
+  userId String? //ForeignKey
+  user   User?   @relation(fields: [userId], references: [id])
+
+  @@index([PollId])
+  @@index([OptionId])
+  @@index([userId])
+}
