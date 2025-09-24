@@ -16,7 +16,7 @@ export const createPollHandler = catchAsync(
     const poll = await createPoll(req.body, userId);
 
     // Construct the full shareable URL
-    const shareableUrl = `${process.env.BASE_URL}/s/${poll.shareCode}`;
+    const shareableUrl = `${process.env.BACKEND_BASE_URL}/s/${poll.shareCode}`;
 
     res
       .status(201)
@@ -54,7 +54,7 @@ export const getShareLinkHandler = catchAsync(
   ) => {
     const { pollId } = req.params;
     const shareCode = await getPollShareLink(pollId);
-    const shareableUrl = `${process.env.BASE_URL}/s/${shareCode}`;
+    const shareableUrl = `${process.env.BACKEND_BASE_URL}/s/${shareCode}`;
     res.status(200).json({ status: "success", data: { shareableUrl } });
   }
 );
